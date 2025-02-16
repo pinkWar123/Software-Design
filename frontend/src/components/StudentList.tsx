@@ -1,4 +1,4 @@
-import { Space, Table, Input } from 'antd';
+import { Space, Table, Input, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import IStudent from '../models/Student';
 import React, { useEffect, useState } from 'react';
@@ -22,6 +22,7 @@ interface StudentListProps {
 const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, statuses, faculties, updateStudents}) => {
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState<IStudent | null>(null);
+    const [selectedFaculty, setSelectedFaculty] = useState<number | null>(null);
     const [searchText, setSearchText] = useState('');
     const [filteredStudents, setFilteredStudents] = useState<IStudent[]>([]);
     
@@ -34,6 +35,24 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
         await callDeleteStudent(studentId);
         await updateStudents();
     }
+
+    const handleFacultyChange = (value: number | null) => {
+        setSelectedFaculty(value);
+        filterStudents(searchText, value);
+    };
+
+    const filterStudents = (searchValue: string, facultyId: number | null) => {
+        const filtered = students.filter((student) => {
+            const matchesSearch = 
+                student.fullName.toLowerCase().includes(searchValue.toLowerCase()) ||
+                student.studentId.toString().toLowerCase().includes(searchValue.toLowerCase());
+            
+            const matchesFaculty = facultyId ? student.facultyId === facultyId : true;
+
+            return matchesSearch && matchesFaculty;
+        });
+        setFilteredStudents(filtered);
+    };
     const columns: ColumnsType<IStudent> = [
       {
         title: 'Mã sinh viên',
@@ -113,8 +132,9 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
         const filtered = students.filter((student) => {
             const searchValue = value.toLowerCase();
             return (
-                student.fullName.toLowerCase().includes(searchValue) ||
-                student.studentId.toString().toLowerCase().includes(searchValue)
+                (student.fullName.toLowerCase().includes(searchValue) ||
+                student.studentId.toString().toLowerCase().includes(searchValue))
+                && (selectedFaculty == null || student.facultyId == selectedFaculty)
             );
         });
         setFilteredStudents(filtered);
@@ -131,6 +151,16 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
                     onChange={(e) => handleSearch(e.target.value)}
                     style={{ maxWidth: 500 }}
                 />
+                <Select
+                        placeholder="Chọn khoa"
+                        allowClear
+                        style={{ width: 200 }}
+                        onChange={handleFacultyChange}
+                        options={faculties.map(faculty => ({
+                            label: faculty.name,
+                            value: faculty.id
+                        }))}
+                    />
                 <StudentCreateModal studyPrograms={studyPrograms} statuses={statuses} faculties={faculties} updateStudents={updateStudents} />
                 {selectedStudent && (
                     <StudentUpdateModal 

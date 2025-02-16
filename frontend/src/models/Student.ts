@@ -1,3 +1,4 @@
+import IFaculty from "./Faculty";
 import IProgram from "./Program";
 import IStatus from "./Status";
 
@@ -6,12 +7,15 @@ interface IStudent {
     fullName: string;
     dateOfBirth: string;
     gender: string;
-    faculty: string;
+    facultyId: number;
     batch: string;
-    program: IProgram;
+    programId: number;
     address: string;
     email: string;
     phoneNumber: string;
+    statusId: number;
+    faculty: IFaculty;
+    program: IProgram;
     status: IStatus;
 }
 
