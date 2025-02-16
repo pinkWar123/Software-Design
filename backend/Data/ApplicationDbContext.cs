@@ -16,5 +16,6 @@ namespace backend.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<StudyProgram> StudyPrograms { get; set; }
         public DbSet<Status> Statuses { get; set; }
+        public DbSet<Faculty> Faculties { get; set; }
     }
 }
