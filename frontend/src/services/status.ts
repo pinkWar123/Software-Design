@@ -1,3 +1,4 @@
+import IStatus from "../models/Status";
 import axiosInstance from "./axios.config";
 
 export const callGetAllStatuses = async () => {
@@ -9,3 +10,12 @@ export const callGetAllStatuses = async () => {
         throw error;
     }
 }
+
+export const callCreateStatus = async (status: IStatus) => {
+    return await axiosInstance.post('/Status', status);
+}
+
+export const callUpdateStatus = async (id: number, status: IStatus) => {
+    return await axiosInstance.put(`/Status/${id}`, status);
+}
+
