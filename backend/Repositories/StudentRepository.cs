@@ -25,11 +25,11 @@ namespace backend.Repositories
                 FullName = student.FullName,
                 DateOfBirth = student.DateOfBirth,
                 Gender = student.Gender,
-                Faculty = student.Faculty,
                 Batch = student.Batch,
                 Address = student.Address,
                 Email = student.Email,
                 PhoneNumber = student.PhoneNumber,
+                FacultyId = student.FacultyId,
                 StatusId = student.StatusId,
                 ProgramId = student.ProgramId
             };
@@ -54,12 +54,20 @@ namespace backend.Repositories
 
         public async Task<IEnumerable<Student>> GetAllStudentsAsync()
         {
-            return await _context.Students.Include(s => s.Status).Include(s => s.Program).ToListAsync();
+            return await _context.Students
+                .Include(s => s.Status)
+                .Include(s => s.Program)
+                .Include(s => s.Faculty)
+                .ToListAsync();
         }
 
         public async Task<Student> GetStudentByIdAsync(int id)
         {
-            return await _context.Students.Include(s => s.Status).Include(s => s.Program).FirstOrDefaultAsync(s => s.StudentId == id);
+            return await _context.Students
+                .Include(s => s.Status)
+                .Include(s => s.Program)
+                .Include(s => s.Faculty)
+                .FirstOrDefaultAsync(s => s.StudentId == id);
         }
 
         public async Task<bool> UpdateStudentAsync(UpdateStudentDto student)
@@ -73,13 +81,13 @@ namespace backend.Repositories
             existingStudent.FullName = student.FullName;
             existingStudent.DateOfBirth = student.DateOfBirth;
             existingStudent.Gender = student.Gender;
-            existingStudent.Faculty = student.Faculty;
             existingStudent.Batch = student.Batch;
             existingStudent.Address = student.Address;
             existingStudent.Email = student.Email;
             existingStudent.PhoneNumber = student.PhoneNumber;
             existingStudent.StatusId = student.StatusId;
             existingStudent.ProgramId = student.ProgramId;
+            existingStudent.FacultyId = student.FacultyId;
             
 
             await _context.SaveChangesAsync();

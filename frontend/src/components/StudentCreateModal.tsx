@@ -3,14 +3,15 @@ import { Button, Modal, Form, Input, Select, DatePicker, message } from 'antd';
 import { callCreateStudent } from '../services/student';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
-
+import IFaculty from '../models/Faculty';
 interface StudentCreateModalProps {
     studyPrograms: IProgram[];
     statuses: IStatus[];
+    faculties: IFaculty[];
     updateStudents: () => Promise<void>;
 }
 
-const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, statuses, updateStudents }) => {
+const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, statuses, faculties, updateStudents }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
@@ -75,11 +76,17 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             </Select>
           </Form.Item>
           <Form.Item
-            name="faculty"
+            name="facultyId"
             label="Khoa"
-            rules={[{ required: true, message: 'Vui lòng nhập khoa!' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn khoa!' }]}
           >
-            <Input />
+            <Select>
+              {faculties?.map(faculty => (
+                <Select.Option key={faculty.id} value={faculty.id}>
+                  {faculty.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item
             name="batch"
@@ -101,7 +108,7 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             rules={[{ required: true, message: 'Vui lòng chọn chương trình học!' }]}
           >
             <Select>
-              {studyPrograms.map(program => (
+              {studyPrograms?.map(program => (
                 <Select.Option key={program.id} value={program.id}>
                   {program.name}
                 </Select.Option>
@@ -114,7 +121,7 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
           >
             <Select>
-              {statuses.map(status => (
+              {statuses?.map(status => (
                 <Select.Option key={status.id} value={status.id}>
                   {status.name}
                 </Select.Option>

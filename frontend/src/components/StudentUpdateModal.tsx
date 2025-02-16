@@ -5,12 +5,13 @@ import IStudent from '../models/Student';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import dayjs from 'dayjs';
-
+import IFaculty from '../models/Faculty';
 
 interface StudentUpdateModalProps {
     student: IStudent | null;
     studyPrograms: IProgram[];
     statuses: IStatus[];
+    faculties: IFaculty[];
     isOpen: boolean;
     onClose: () => void;
     updateStudents: () => Promise<void>;
@@ -20,6 +21,7 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
     student,
     studyPrograms,
     statuses,
+    faculties,
     isOpen,
     onClose,
     updateStudents
@@ -93,11 +95,18 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
                     </Select>
                 </Form.Item>
                 <Form.Item
-                    name="faculty"
+                    name="facultyId"
                     label="Khoa"
                     rules={[{ required: true, message: 'Vui lòng nhập khoa!' }]}
                 >
-                    <Input />
+                    <Select>
+                        {faculties.map(faculty => (
+                                <Select.Option key={faculty.id} value={faculty.id}>
+                                    {faculty.name}
+                                </Select.Option>
+                            ))}
+
+                    </Select>
                 </Form.Item>
                 <Form.Item
                     name="batch"
