@@ -61,8 +61,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-// builder.Services.AddScoped<IStudyProgramRepository, StudyProgramRepository>();
-// builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+builder.Services.AddScoped<IFacultyRepository, FacultyRepository>();
+builder.Services.AddScoped<IStudyProgramRepository, StudyProgramRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+
 
 var app = builder.Build();
 
