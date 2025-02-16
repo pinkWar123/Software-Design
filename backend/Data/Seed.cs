@@ -40,6 +40,36 @@ namespace backend.Data
                 context.SaveChanges();
             }
 
+            if (!context.Faculties.Any())
+        {
+            var faculties = new List<Faculty>
+            {
+                new Faculty 
+                { 
+                    Name = "Công nghệ thông tin",
+                },
+                new Faculty 
+                { 
+                    Name = "Kinh tế",
+                },
+                new Faculty 
+                { 
+                    Name = "Kỹ thuật điện",
+                },
+                new Faculty 
+                { 
+                    Name = "Cơ khí",
+                },
+                new Faculty 
+                { 
+                    Name = "Xây dựng",
+                }
+            };
+
+            context.Faculties.AddRange(faculties);
+            context.SaveChanges();
+        }
+
             // Seed Users
             if (!context.Students.Any())
             {
