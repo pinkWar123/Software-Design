@@ -1,3 +1,4 @@
+import IProgram from "../models/Program";
 import axiosInstance from "./axios.config";
 
 export const callGetStudyPrograms = async () => {
@@ -10,3 +11,10 @@ export const callGetStudyPrograms = async () => {
     }
 }
 
+export const callCreateStudyProgram = async (studyProgram: IProgram) => {
+    return await axiosInstance.post('/StudyProgram', studyProgram);
+}
+
+export const callUpdateStudyProgram = async (id: number, studyProgram: IProgram) => {
+    return await axiosInstance.put(`/StudyProgram/${id}`, studyProgram);
+}
