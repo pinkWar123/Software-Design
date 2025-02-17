@@ -8,7 +8,9 @@ using backend.Entities;
 using backend.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using backend.Services;
 namespace backend.Controllers
 {
     [ApiController]
@@ -17,11 +19,13 @@ namespace backend.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IStudentRepository _studentRepository;
+        private readonly IStudentService _studentService;
 
-        public StudentController(ApplicationDbContext context, IStudentRepository studentRepository)
+        public StudentController(ApplicationDbContext context, IStudentRepository studentRepository, IStudentService studentService)
         {
             _context = context;
             _studentRepository = studentRepository;
+            _studentService = studentService;
         }
 
         [HttpGet]
@@ -79,6 +83,36 @@ namespace backend.Controllers
             }
 
             return Ok(student);
+        }
+
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportStudents(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Không tìm thấy file");
+
+            var extension = Path.GetExtension(file.FileName).ToLower();
+            if (extension != ".csv" && extension != ".json")
+                return BadRequest("Chỉ hỗ trợ file CSV và JSON");
+
+            try
+            {
+                using var stream = file.OpenReadStream();
+                if (extension == ".csv")
+                {
+                    await _studentService.ImportFromCsv(stream);
+                }
+                else if (extension == ".json")
+                {
+                    Console.WriteLine("This is json file");
+                    await _studentService.ImportFromJson(stream);
+                }
+                return Ok(new { message = "Import thành công" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Lỗi: {ex.Message}" });
+            }
         }
     }
 }

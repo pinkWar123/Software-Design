@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Repositories;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -64,7 +65,7 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IFacultyRepository, FacultyRepository>();
 builder.Services.AddScoped<IStudyProgramRepository, StudyProgramRepository>();
 builder.Services.AddScoped<IStatusRepository, StatusRepository>();
-
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 var app = builder.Build();
 

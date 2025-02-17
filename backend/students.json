@@ -1,0 +1,49 @@
+{
+    "students": [
+      {
+        "fullName": "Nguyễn Văn A",
+        "dateOfBirth": "2000-01-15",
+        "gender": "Male",
+        "batch": "K15",
+        "address": "123 Đường ABC",
+        "email": "nguyenvana@example.com",
+        "phoneNumber": "0123456789"
+      },
+      {
+        "fullName": "Trần Thị B",
+        "dateOfBirth": "2000-03-20",
+        "gender": "Female",
+        "batch": "K15",
+        "address": "456 Đường XYZ",
+        "email": "tranthib@example.com",
+        "phoneNumber": "0987654321"
+      },
+      {
+        "fullName": "Lê Văn C",
+        "dateOfBirth": "2000-05-10",
+        "gender": "Male",
+        "batch": "K15",
+        "address": "789 Đường DEF",
+        "email": "levanc@example.com",
+        "phoneNumber": "0369852147"
+      },
+      {
+        "fullName": "Phạm Thị D",
+        "dateOfBirth": "2000-07-25",
+        "gender": "Female",
+        "batch": "K15",
+        "address": "321 Đường GHI",
+        "email": "phamthid@example.com",
+        "phoneNumber": "0741852963"
+      },
+      {
+        "fullName": "Hoàng Văn E",
+        "dateOfBirth": "2000-09-30",
+        "gender": "Male",
+        "batch": "K15",
+        "address": "654 Đường JKL",
+        "email": "hoangvane@example.com",
+        "phoneNumber": "0258963147"
+      }
+    ]
+  }

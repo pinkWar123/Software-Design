@@ -1,0 +1,6 @@
+FullName,DateOfBirth,Gender,Batch,Address,Email,PhoneNumber
+Nguyễn Văn A,2000-01-15,Male,K15,123 Đường ABC,nguyenvana@example.com,0123456789
+Trần Thị B,2000-03-20,Female,K15,456 Đường XYZ,tranthib@example.com,0987654321
+Lê Văn C,2000-05-10,Male,K15,789 Đường DEF,levanc@example.com,0369852147
+Phạm Thị D,2000-07-25,Female,K15,321 Đường GHI,phamthid@example.com,0741852963
+Hoàng Văn E,2000-09-30,Male,K15,654 Đường JKL,hoangvane@example.com,0258963147

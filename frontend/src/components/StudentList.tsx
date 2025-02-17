@@ -1,14 +1,15 @@
-import { Space, Table, Input, Select } from 'antd';
+import { Space, Table, Input, Select, Upload, Button, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import IStudent from '../models/Student';
 import React, { useEffect, useState } from 'react';
 import { callDeleteStudent } from '../services/student';
 import StudentCreateModal from './StudentCreateModal';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
 import StudentUpdateModal from './StudentUpdateModal';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import IFaculty from '../models/Faculty';
+import type { UploadProps } from 'antd';
 const { Search } = Input;
 
 interface StudentListProps {
@@ -140,6 +141,58 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
         setFilteredStudents(filtered);
     };
 
+    const uploadProps: UploadProps = {
+        name: 'file',
+        accept: '.csv,.json',
+        action: 'http://localhost:5215/api/Student/import',
+        showUploadList: false,
+        onChange(info) {
+            if (info.file.status === 'done') {
+                message.success('Import sinh viên thành công');
+                updateStudents();
+            } else if (info.file.status === 'error') {
+                message.error('Import sinh viên thất bại');
+            }
+        },
+    };
+
+    const downloadTemplate = (type: 'csv' | 'json') => {
+        let content: string;
+        let filename: string;
+        let mimeType: string;
+
+        if (type === 'csv') {
+            content = `FullName,DateOfBirth,Gender,Batch,Address,Email,PhoneNumber
+Nguyễn Văn A,2000-01-15,Male,K15,123 Đường ABC,nguyenvana@example.com,0123456789`;
+            filename = 'student_template.csv';
+            mimeType = 'text/csv;charset=utf-8;';
+        } else {
+            content = JSON.stringify({
+                students: [{
+                    fullName: "Nguyễn Văn A",
+                    dateOfBirth: "2000-01-15",
+                    gender: "Male",
+                    batch: "K15",
+                    address: "123 Đường ABC",
+                    email: "nguyenvana@example.com",
+                    phoneNumber: "0123456789"
+                }]
+            }, null, 2);
+            filename = 'student_template.json';
+            mimeType = 'application/json';
+        }
+
+        const blob = new Blob([content], { type: mimeType });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    };
+
     return (
         <>
             <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
@@ -176,6 +229,17 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
                         updateStudents={updateStudents}
                     />
                 )}
+                <Space>
+                    <Upload {...uploadProps}>
+                        <Button icon={<UploadOutlined />}>Import từ CSV/JSON</Button>
+                    </Upload>
+                    <Button onClick={() => downloadTemplate('csv')}>
+                        Tải template CSV
+                    </Button>
+                    <Button onClick={() => downloadTemplate('json')}>
+                        Tải template JSON
+                    </Button>
+                </Space>
                 <Table 
                     columns={columns} 
                     dataSource={filteredStudents}
