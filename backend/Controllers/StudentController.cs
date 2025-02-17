@@ -114,5 +114,27 @@ namespace backend.Controllers
                 return BadRequest(new { message = $"Lỗi: {ex.Message}" });
             }
         }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportStudents([FromQuery] string format = "csv")
+        {
+            try
+            {
+                if (format.ToLower() == "json")
+                {
+                    var jsonData = await _studentService.ExportToJson();
+                    return File(jsonData, "application/json", "students.json");
+                }
+                else
+                {
+                    var csvData = await _studentService.ExportToCsv();
+                    return File(csvData, "text/csv", "students.csv");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Export failed: {ex.Message}");
+            }
+        }
     }
 }

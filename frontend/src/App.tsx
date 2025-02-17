@@ -11,6 +11,7 @@ import { callGetAllStatuses } from './services/status';
 import IFaculty from './models/Faculty';
 import Program from './components/Program';
 import Status from './components/Status';
+import {App as AntdApp} from 'antd';
 function App() {
   const [students, setStudents] = useState<IStudent[]>([]);
   const [studyPrograms, setStudyPrograms] = useState<IProgram[]>([]);
@@ -59,12 +60,12 @@ function App() {
 
   
   return (
-    <>
+    <AntdApp>
       <StudentList students={students} studyPrograms={studyPrograms} statuses={statuses} faculties={faculties} updateStudents={updateStudents} />
       <FacultyList faculties={faculties} updateFaculties={setFaculties}/>
       <Program programs={studyPrograms} updatePrograms={setStudyPrograms}/>
       <Status statuses={statuses} updateStatuses={setStatuses}/>
-    </>
+    </AntdApp>
   )
 }
 

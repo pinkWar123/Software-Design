@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using backend.Entities;
 using backend.Dtos.Student;
 using backend.Data;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 namespace backend.Services
 {
@@ -101,18 +103,39 @@ namespace backend.Services
             var students = await _context.Students
                 .Include(s => s.Faculty)
                 .Include(s => s.Program)
+                .Include(s => s.Status)
                 .ToListAsync();
 
             using var memoryStream = new MemoryStream();
             using var writer = new StreamWriter(memoryStream);
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-            csv.WriteRecords(students.Select(s => new StudentExportDto
+            // Viết header
+            csv.WriteField("Mã sinh viên");
+            csv.WriteField("Họ và tên");
+            csv.WriteField("Ngày sinh");
+            csv.WriteField("Giới tính");
+            csv.WriteField("Khoa");
+            csv.WriteField("Chương trình");
+            csv.WriteField("Email");
+            csv.WriteField("Số điện thoại");
+            csv.WriteField("Trạng thái");
+            csv.NextRecord();
+
+            // Viết dữ liệu
+            foreach (var student in students)
             {
-                StudentId = s.StudentId,
-                FullName = s.FullName,
-                // ... map other properties
-            }));
+                csv.WriteField(student.StudentId);
+                csv.WriteField(student.FullName);
+                csv.WriteField(student.DateOfBirth.ToString("yyyy-MM-dd"));
+                csv.WriteField(student.Gender);
+                csv.WriteField(student.Faculty?.Name);
+                csv.WriteField(student.Program?.Name);
+                csv.WriteField(student.Email);
+                csv.WriteField(student.PhoneNumber);
+                csv.WriteField(student.Status?.Name);
+                csv.NextRecord();
+            }
 
             await writer.FlushAsync();
             return memoryStream.ToArray();
@@ -123,16 +146,28 @@ namespace backend.Services
             var students = await _context.Students
                 .Include(s => s.Faculty)
                 .Include(s => s.Program)
+                .Include(s => s.Status)
+                .Select(s => new
+                {
+                    s.StudentId,
+                    s.FullName,
+                    DateOfBirth = s.DateOfBirth.ToString("dd/MM/yyyy"),
+                    s.Gender,
+                    Faculty = s.Faculty.Name,
+                    Program = s.Program.Name,
+                    s.Email,
+                    s.PhoneNumber,
+                    Status = s.Status.Name
+                })
                 .ToListAsync();
 
-            var dtos = students.Select(s => new StudentExportDto
+            var options = new JsonSerializerOptions
             {
-                StudentId = s.StudentId,
-                FullName = s.FullName,
-                // ... map other properties
-            });
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+            };
 
-            return JsonSerializer.SerializeToUtf8Bytes(dtos);
+            return JsonSerializer.SerializeToUtf8Bytes(new { students }, options);
         }
     }
 

@@ -1,10 +1,10 @@
-import { Space, Table, Input, Select, Upload, Button, message } from 'antd';
+import { Space, Table, Input, Select, Upload, Button, App } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import IStudent from '../models/Student';
 import React, { useEffect, useState } from 'react';
 import { callDeleteStudent } from '../services/student';
 import StudentCreateModal from './StudentCreateModal';
-import { DeleteOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, UploadOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import StudentUpdateModal from './StudentUpdateModal';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
@@ -26,15 +26,30 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
     const [selectedFaculty, setSelectedFaculty] = useState<number | null>(null);
     const [searchText, setSearchText] = useState('');
     const [filteredStudents, setFilteredStudents] = useState<IStudent[]>([]);
-    
+    const {modal, message} = App.useApp()
     const handleUpdateStudent = async(student: IStudent) => {
         setSelectedStudent(student);
         setIsUpdateModalOpen(true);
     }
 
     const handleDeleteStudent = async(studentId: number) => {
-        await callDeleteStudent(studentId);
-        await updateStudents();
+        modal.confirm({
+            title: 'Xác nhận xóa',
+            icon: <ExclamationCircleOutlined />,
+            content: 'Bạn có chắc chắn muốn xóa sinh viên này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            async onOk() {
+                try {
+                    await callDeleteStudent(studentId);
+                    await updateStudents();
+                    message.success('Xóa sinh viên thành công');
+                } catch (error) {
+                    message.error('Xóa sinh viên thất bại');
+                }
+            },
+        });
     }
 
     const handleFacultyChange = (value: number | null) => {
@@ -193,6 +208,30 @@ Nguyễn Văn A,2000-01-15,Male,K15,123 Đường ABC,nguyenvana@example.com,012
         document.body.removeChild(a);
     };
 
+    const handleExport = async (format: 'csv' | 'json') => {
+        try {
+            const response = await fetch(`http://localhost:5215/api/Student/export?format=${format}`);
+            if (!response.ok) {
+                throw new Error('Export failed');
+            }
+            
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `students.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            message.success(`Export to ${format.toUpperCase()} thành công`);
+        } catch (error) {
+            message.error('Export thất bại');
+            console.error('Export error:', error);
+        }
+    };
+
     return (
         <>
             <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
@@ -238,6 +277,12 @@ Nguyễn Văn A,2000-01-15,Male,K15,123 Đường ABC,nguyenvana@example.com,012
                     </Button>
                     <Button onClick={() => downloadTemplate('json')}>
                         Tải template JSON
+                    </Button>
+                    <Button onClick={() => handleExport('csv')}>
+                        Export to CSV
+                    </Button>
+                    <Button onClick={() => handleExport('json')}>
+                        Export to JSON
                     </Button>
                 </Space>
                 <Table 
