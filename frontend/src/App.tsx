@@ -12,6 +12,8 @@ import IFaculty from './models/Faculty';
 import Program from './components/Program';
 import Status from './components/Status';
 import {App as AntdApp} from 'antd';
+import VersionInfo from './components/VersionInfo';
+
 function App() {
   const [students, setStudents] = useState<IStudent[]>([]);
   const [studyPrograms, setStudyPrograms] = useState<IProgram[]>([]);
@@ -65,6 +67,7 @@ function App() {
       <FacultyList faculties={faculties} updateFaculties={setFaculties}/>
       <Program programs={studyPrograms} updatePrograms={setStudyPrograms}/>
       <Status statuses={statuses} updateStatuses={setStatuses}/>
+      <VersionInfo />
     </AntdApp>
   )
 }
