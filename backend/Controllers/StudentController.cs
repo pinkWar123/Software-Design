@@ -20,12 +20,14 @@ namespace backend.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IStudentRepository _studentRepository;
         private readonly IStudentService _studentService;
+        private readonly ILoggingService _loggingService;
 
-        public StudentController(ApplicationDbContext context, IStudentRepository studentRepository, IStudentService studentService)
+        public StudentController(ApplicationDbContext context, IStudentRepository studentRepository, IStudentService studentService, ILoggingService loggingService)
         {
             _context = context;
             _studentRepository = studentRepository;
             _studentService = studentService;
+            _loggingService = loggingService;
         }
 
         [HttpGet]
@@ -38,39 +40,77 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateStudent([FromBody] CreateStudentDto student)
         {
-            if (student == null)
-            {
-                return BadRequest("Student data is required");
-            }
-
+        try 
+        {
             var newStudent = await _studentRepository.CreateStudentAsync(student);
-
+            await _loggingService.LogAsync(
+                "CreateStudent",
+                $"Created student: {newStudent.StudentId} - {newStudent.FullName}"
+            );
             return CreatedAtAction(nameof(GetStudents), new { id = newStudent.StudentId }, newStudent);
         }
+        catch (Exception ex)
+        {
+            await _loggingService.LogAsync(
+                "Error",
+                $"Failed to create student: {ex.Message}"
+            );
+            throw;
+        }
+    }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
-            var isDeleted = await _studentRepository.DeleteStudentAsync(id);
-            if (!isDeleted)
+            try
             {
-                return NotFound();
+                await _studentRepository.DeleteStudentAsync(id);
+                await _loggingService.LogAsync(
+                    "DeleteStudent",
+                    $"Deleted student ID: {id}"
+                );
+                return NoContent();
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                await _loggingService.LogAsync(
+                    "Error",
+                    $"Failed to delete student {id}: {ex.Message}"
+                );
+                throw;
+            }
         }
         
         [HttpPut]
         public async Task<IActionResult> UpdateStudent([FromBody] UpdateStudentDto student)
         {
-
-            var isUpdated = await _studentRepository.UpdateStudentAsync(student);
-            if (!isUpdated)
+            try
             {
-                return NotFound();
-            }
+                var isUpdated = await _studentRepository.UpdateStudentAsync(student);
+                if (!isUpdated)
+                {
+                    return NotFound();
+                }
+                await _loggingService.LogAsync(
+                    "UpdateStudent",
+                    $"Updated student ID: {student.StudentId}"
+                );
+                await _loggingService.LogAsync(
+                    "UpdateStudent",
+                    $"Updated student ID: {student.StudentId}"
+                );
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (System.Exception ex)
+            {
+                await _loggingService.LogAsync(
+                    "Error",
+                    $"Failed to update student: {ex.Message}"
+                );
+
+                throw;
+            }
         }
 
         [HttpGet("{id}")]
@@ -81,7 +121,10 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-
+            await _loggingService.LogAsync(
+                "GetStudentById",
+                $"Get student ID: {id}"
+            );
             return Ok(student);
         }
 
@@ -107,10 +150,18 @@ namespace backend.Controllers
                     Console.WriteLine("This is json file");
                     await _studentService.ImportFromJson(stream);
                 }
+                await _loggingService.LogAsync(
+                "ImportStudents",
+                $"Imported students from {file.FileName}"
+            );
                 return Ok(new { message = "Import thành công" });
             }
             catch (Exception ex)
             {
+                await _loggingService.LogAsync(
+                    "Error",
+                    $"Failed to import students: {ex.Message}"
+                );
                 return BadRequest(new { message = $"Lỗi: {ex.Message}" });
             }
         }
@@ -123,16 +174,28 @@ namespace backend.Controllers
                 if (format.ToLower() == "json")
                 {
                     var jsonData = await _studentService.ExportToJson();
+                    await _loggingService.LogAsync(
+                        "ExportStudents",
+                        $"Exported students to JSON"
+                    );
                     return File(jsonData, "application/json", "students.json");
                 }
                 else
                 {
                     var csvData = await _studentService.ExportToCsv();
+                    await _loggingService.LogAsync(
+                        "ExportStudents",
+                        $"Exported students to CSV"
+                    );
                     return File(csvData, "text/csv", "students.csv");
                 }
             }
             catch (Exception ex)
             {
+                await _loggingService.LogAsync(
+                "Error",
+                $"Failed to import students: {ex.Message}"
+            );
                 return BadRequest($"Export failed: {ex.Message}");
             }
         }
