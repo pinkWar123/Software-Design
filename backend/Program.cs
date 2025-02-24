@@ -1,6 +1,7 @@
 using backend.Data;
 using backend.Repositories;
 using backend.Services;
+using backend.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -67,6 +68,10 @@ builder.Services.AddScoped<IStudyProgramRepository, StudyProgramRepository>();
 builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddSingleton<ILoggingService, LoggingService>();
+
+builder.Services.Configure<PhoneSettings>(builder.Configuration.GetSection("Rules:Student:PhoneNumber"));
+builder.Services.Configure<StudentStatusTransitions>(builder.Configuration.GetSection("Rules:StudentStatusTransitions"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Rules:Student:EmailDomain"));
 
 var app = builder.Build();
 
