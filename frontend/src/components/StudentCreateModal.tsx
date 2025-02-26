@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Modal, Form, Input, Select, DatePicker, message } from 'antd';
+import { Button, Modal, Form, Input, Select, DatePicker, message, App } from 'antd';
 import { callCreateStudent } from '../services/student';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import IFaculty from '../models/Faculty';
+import { ValidationError } from '../../helpers/errors';
 interface StudentCreateModalProps {
     studyPrograms: IProgram[];
     statuses: IStatus[];
@@ -13,6 +14,7 @@ interface StudentCreateModalProps {
 
 const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, statuses, faculties, updateStudents }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {message} = App.useApp();
   const [form] = Form.useForm();
 
   const showModal = () => {
@@ -32,7 +34,8 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
       handleCancel();
       await updateStudents();
     } catch (error) {
-      message.error('Có lỗi xảy ra khi tạo học sinh mới');
+      const _error = error as ValidationError;
+      message.error(_error?.response?.data?.title ?? "Có lỗi xảy ra khi tạo học sinh mới");
     }
   };
 
@@ -50,6 +53,13 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
         footer={null}
       >
         <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <Form.Item
+            name="studentId"
+            label="Mã số sinh viên"
+            rules={[{ required: true, message: 'Vui lòng nhập mã số sinh viên!' }]}
+          >
+            <Input />
+          </Form.Item>
           <Form.Item
             name="fullName"
             label="Họ và tên"

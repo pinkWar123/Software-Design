@@ -11,10 +11,11 @@ import { callGetAllStatuses } from './services/status';
 import IFaculty from './models/Faculty';
 import Program from './components/Program';
 import Status from './components/Status';
-import {App as AntdApp} from 'antd';
+import {App as AntdApp, message} from 'antd';
 import VersionInfo from './components/VersionInfo';
-
 function App() {
+    const [messageApi, contextHolder] = message.useMessage();
+    
   const [students, setStudents] = useState<IStudent[]>([]);
   const [studyPrograms, setStudyPrograms] = useState<IProgram[]>([]);
   const [statuses, setStatuses] = useState<IStatus[]>([]);
@@ -63,6 +64,7 @@ function App() {
   
   return (
     <AntdApp>
+      {contextHolder}
       <StudentList students={students} studyPrograms={studyPrograms} statuses={statuses} faculties={faculties} updateStudents={updateStudents} />
       <FacultyList faculties={faculties} updateFaculties={setFaculties}/>
       <Program programs={studyPrograms} updatePrograms={setStudyPrograms}/>

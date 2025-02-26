@@ -42,7 +42,7 @@ namespace backend.Controllers
         {
         try 
         {
-            var newStudent = await _studentRepository.CreateStudentAsync(student);
+            var newStudent = await _studentService.CreateNewStudent(student);
             await _loggingService.LogAsync(
                 "CreateStudent",
                 $"Created student: {newStudent.StudentId} - {newStudent.FullName}"

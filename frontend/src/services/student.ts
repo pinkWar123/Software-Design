@@ -4,6 +4,7 @@ import axiosInstance from "./axios.config";
 // ... existing code ...
 
 export interface CreateStudentDto {
+    studentId: number;
     fullName: string;      // Họ tên
     dateOfBirth: Date;     // Ngày tháng năm sinh
     gender: string;        // Giới tính
@@ -18,7 +19,6 @@ export interface CreateStudentDto {
 
 // ... existing code ...
 export interface UpdateStudentDto extends CreateStudentDto {
-    studentId: number;
 }
 
 export const callGetAllStudents = async () => {
@@ -31,15 +31,13 @@ export const callGetAllStudents = async () => {
     }
 }
 
+// studentService.ts
 export const callCreateStudent = async (student: CreateStudentDto) => {
-    try {
-        const response = await axiosInstance.post('/Student', student);
-        return response.data;
-    } catch (error) {
-        console.error('Error creating student:', error);
-        throw error;
-    }
-}
+    // No need for try-catch here since the interceptor handles errors.
+    const response = await axiosInstance.post('/Student', student);
+    return response.data;
+  }
+  
 
 export const callUpdateStudent = async(newStudent: UpdateStudentDto) => {
     try {

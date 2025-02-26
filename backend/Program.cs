@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Middlewares;
 using backend.Repositories;
 using backend.Services;
 using backend.Settings;
@@ -69,9 +70,11 @@ builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddSingleton<ILoggingService, LoggingService>();
 
-builder.Services.Configure<PhoneSettings>(builder.Configuration.GetSection("Rules:Student:PhoneNumber"));
+builder.Services.Configure<StudentSettings>(builder.Configuration.GetSection("Rules:Student"));
 builder.Services.Configure<StudentStatusTransitions>(builder.Configuration.GetSection("Rules:StudentStatusTransitions"));
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Rules:Student:EmailDomain"));
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -107,5 +110,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
-
+app.UseExceptionHandler();
 app.Run();

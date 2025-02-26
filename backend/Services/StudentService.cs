@@ -12,15 +12,25 @@ using backend.Dtos.Student;
 using backend.Data;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using backend.Settings;
+using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
+using backend.Repositories;
 
 namespace backend.Services
 {
     public class StudentService : IStudentService
     {
+        private readonly StudentSettings _studentSettings;
+        private readonly StudentStatusTransitions _studentStatusTransitions;
         private readonly ApplicationDbContext _context;
-        public StudentService(ApplicationDbContext context)
+        private readonly IStatusRepository _statusRepository;
+        public StudentService(ApplicationDbContext context, IOptions<StudentSettings> studentSettings, IOptions<StudentStatusTransitions> studentStatusTransitions, IStatusRepository statusRepository)
         {
             _context = context;
+            _studentSettings = studentSettings.Value;
+            _studentStatusTransitions = studentStatusTransitions.Value;
+            _statusRepository = statusRepository;
         }
 
         public async Task ImportFromCsv(Stream stream)
@@ -168,6 +178,82 @@ namespace backend.Services
             };
 
             return JsonSerializer.SerializeToUtf8Bytes(new { students }, options);
+        }
+
+        public async Task<Student> CreateNewStudent(CreateStudentDto student)
+        {
+            if (!ValidatePhone(student.PhoneNumber))
+                throw new Exception("Số điện thoại không hợp lệ");
+            if (!ValidateEmail(student.Email))
+                throw new Exception("Email không hợp lệ");
+            var existingStudent = await GetStudentById(student.StudentId);
+            if (existingStudent != null)
+                throw new Exception("Mã sinh viên đã tồn tại");
+
+            var newStudent = new Student()
+            {
+                StudentId = student.StudentId,
+                FullName = student.FullName,
+                DateOfBirth = student.DateOfBirth,
+                Gender = student.Gender,
+                Batch = student.Batch,
+                Address = student.Address,
+                Email = student.Email,
+                PhoneNumber = student.PhoneNumber,
+                StatusId = student.StatusId,
+                ProgramId = student.ProgramId,
+                FacultyId = student.FacultyId,
+            };
+
+            await _context.Students.AddAsync(newStudent);
+            await _context.SaveChangesAsync();
+            return newStudent;
+        }
+
+        public async Task<Student?> GetStudentById(int id)
+        {
+            return await _context.Students.FindAsync(id);
+        }
+
+        public bool ValidatePhone(string phoneNumber)
+        {
+            var regex = new System.Text.RegularExpressions.Regex(_studentSettings.PhoneNumber);
+            if (!regex.IsMatch(phoneNumber))
+                return false;
+            return true;
+        }
+
+        public bool ValidateEmail(string email)
+        {
+            if (!email.EndsWith(_studentSettings.EmailDomain))
+                return false;
+            return true;
+        }
+
+        public bool IsTransitionAllowed(string currentStatus, string newStatus)
+        {
+            if (currentStatus == "DangHoc")
+            {
+                return _studentStatusTransitions.DangHoc.Contains(newStatus);
+            }
+            if (currentStatus == "BaoLuu")
+            {
+                return _studentStatusTransitions.BaoLuu.Contains(newStatus);
+            }
+            if (currentStatus == "TotNghiep")
+            {
+                return _studentStatusTransitions.TotNghiep.Contains(newStatus);
+            }
+            if (currentStatus == "DinhChi")
+            {
+                return _studentStatusTransitions.DinhChi.Contains(newStatus);
+            }
+            return false;
+        }
+
+        bool IStudentService.ValidatePhone(string phoneNumber)
+        {
+            return ValidatePhone(phoneNumber);
         }
     }
 

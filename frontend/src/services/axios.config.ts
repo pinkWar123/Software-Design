@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import axios from 'axios';
 
 // Tạo instance axios với cấu hình mặc định
@@ -43,6 +44,7 @@ axiosInstance.interceptors.response.use(
           break;
         default:
           // Xử lý các lỗi khác
+          message.error('Có lỗi xảy ra. Vui lòng thử lại sau.');
           break;
       }
     }

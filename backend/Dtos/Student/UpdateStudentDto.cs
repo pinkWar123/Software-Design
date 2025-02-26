@@ -7,6 +7,5 @@ namespace backend.Dtos.Student
 {
     public class UpdateStudentDto : CreateStudentDto
     {
-        public int StudentId { get; set; }
     }
 }

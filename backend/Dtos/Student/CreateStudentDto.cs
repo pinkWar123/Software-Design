@@ -7,6 +7,7 @@ namespace backend.Dtos.Student
 {
     public class CreateStudentDto
     {
+        public int StudentId { get; set; }
         public string FullName { get; set; }   // Họ tên
         public DateTime DateOfBirth { get; set; }  // Ngày tháng năm sinh 
         public string Gender { get; set; }     // Giới tính
