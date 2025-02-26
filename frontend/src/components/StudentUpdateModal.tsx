@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Select, DatePicker, Button, message } from 'antd';
+import { Modal, Form, Input, Select, DatePicker, Button, message, App } from 'antd';
 import { useEffect } from 'react';
 import { callUpdateStudent } from '../services/student';
 import IStudent from '../models/Student';
@@ -6,7 +6,7 @@ import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import dayjs from 'dayjs';
 import IFaculty from '../models/Faculty';
-
+import { ValidationError } from '../helpers/errors';
 interface StudentUpdateModalProps {
     student: IStudent | null;
     studyPrograms: IProgram[];
@@ -27,6 +27,7 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
     updateStudents
 }) => {
     if(!student) return <></>;
+    const {message} = App.useApp();
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -42,9 +43,8 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
 
     const handleSubmit = async (values: any) => {
         try {
-            const updatedStudent = await callUpdateStudent({
+            const updatedStudent = await callUpdateStudent(student.studentId, {
                 ...values,
-                studentId: student.studentId,
                 dateOfBirth: values.dateOfBirth
             });
             console.log(updatedStudent);
@@ -52,8 +52,9 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
             await updateStudents();
             onClose();
         } catch (error) {
-            console.error('Error updating student:', error);
-            message.error('Có lỗi xảy ra khi cập nhật sinh viên!');
+            console.log(error);
+            const validationError = error as ValidationError;
+            message.error(validationError.response.data.title);
         }
     };
 
@@ -65,6 +66,13 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
             footer={null}
         >
             <Form form={form} initialValues={student} onFinish={handleSubmit} layout="vertical">
+                <Form.Item
+                    name="studentId"
+                    label="Mã sinh viên"
+                    rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}
+                >
+                    <Input />
+                </Form.Item>
                 <Form.Item
                     name="fullName"
                     label="Họ và tên"

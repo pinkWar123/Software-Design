@@ -16,6 +16,7 @@ namespace backend.Services
 
         Task<Student> CreateNewStudent(CreateStudentDto student);
         Task<Student?> GetStudentById(int id);
+        Task<Student?> UpdateStudent(int studentId,UpdateStudentDto student);
         bool ValidatePhone(string phoneNumber);
         bool ValidateEmail(string email);
     }

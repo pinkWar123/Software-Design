@@ -255,6 +255,38 @@ namespace backend.Services
         {
             return ValidatePhone(phoneNumber);
         }
+
+        public async Task<Student?> UpdateStudent(int studentId, UpdateStudentDto student)
+        {
+            var existingStudent = await GetStudentById(studentId);
+            if (existingStudent == null)
+                throw new Exception("Không tìm thấy sinh viên");
+            if (!ValidatePhone(student.PhoneNumber))
+                throw new Exception("Số điện thoại không hợp lệ");
+            if (!ValidateEmail(student.Email))
+                throw new Exception("Email không hợp lệ");
+            
+            if(student.StudentId != studentId)
+            {
+                var anotherStudent = await GetStudentById(student.StudentId);
+                if (anotherStudent != null)
+                    throw new Exception("Mã sinh viên đã tồn tại");
+            }
+
+            existingStudent.FullName = student.FullName;
+            existingStudent.DateOfBirth = student.DateOfBirth;
+            existingStudent.Gender = student.Gender;
+            existingStudent.Batch = student.Batch;
+            existingStudent.Address = student.Address;
+            existingStudent.Email = student.Email;
+            existingStudent.PhoneNumber = student.PhoneNumber;
+            existingStudent.StatusId = student.StatusId;
+            existingStudent.ProgramId = student.ProgramId;
+            existingStudent.FacultyId = student.FacultyId;
+
+            await _context.SaveChangesAsync();
+            return existingStudent;
+        }
     }
 
     // Class để deserialize JSON

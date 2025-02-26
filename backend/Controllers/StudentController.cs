@@ -81,23 +81,23 @@ namespace backend.Controllers
             }
         }
         
-        [HttpPut]
-        public async Task<IActionResult> UpdateStudent([FromBody] UpdateStudentDto student)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateStudent(int id, [FromBody] UpdateStudentDto student)
         {
             try
             {
-                var isUpdated = await _studentRepository.UpdateStudentAsync(student);
-                if (!isUpdated)
+                var updatedStudent = await _studentService.UpdateStudent(id, student);
+                if (updatedStudent == null)
                 {
                     return NotFound();
                 }
                 await _loggingService.LogAsync(
                     "UpdateStudent",
-                    $"Updated student ID: {student.StudentId}"
+                    $"Updated student ID: {updatedStudent.StudentId}"
                 );
                 await _loggingService.LogAsync(
                     "UpdateStudent",
-                    $"Updated student ID: {student.StudentId}"
+                    $"Updated student ID: {updatedStudent.StudentId}"
                 );
 
                 return NoContent();

@@ -39,14 +39,11 @@ export const callCreateStudent = async (student: CreateStudentDto) => {
   }
   
 
-export const callUpdateStudent = async(newStudent: UpdateStudentDto) => {
-    try {
-        const response = await axiosInstance.put(`/Student`, newStudent);
+export const callUpdateStudent = async(studentId: number, newStudent: UpdateStudentDto) => {
+   
+        const response = await axiosInstance.put(`/Student/${studentId}`, newStudent);
         return response.data;
-    } catch (error) {
-        console.error('Error updating student:', error);
-        throw error;
-    }
+    
 }
 
 export const callDeleteStudent = async(studentId: number) => {

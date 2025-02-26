@@ -4,7 +4,7 @@ import { callCreateStudent } from '../services/student';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import IFaculty from '../models/Faculty';
-import { ValidationError } from '../../helpers/errors';
+import { ValidationError } from '../helpers/errors';
 interface StudentCreateModalProps {
     studyPrograms: IProgram[];
     statuses: IStatus[];
