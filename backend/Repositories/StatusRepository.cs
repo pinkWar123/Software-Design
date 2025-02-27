@@ -60,6 +60,7 @@ namespace backend.Repositories
             }
 
             statusEntity.Name = status.Name;
+            statusEntity.OutgoingTransitions = status.OutgoingTransitions.Select(id => new StatusTransition { TargetStatusId = id, SourceStatusId = statusEntity.Id }).ToList();
 
             await _context.SaveChangesAsync();
             return statusEntity;

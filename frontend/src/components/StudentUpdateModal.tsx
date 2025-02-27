@@ -27,6 +27,7 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
     updateStudents
 }) => {
     if(!student) return <></>;
+    console.log(student)
     const {message} = App.useApp();
     const [form] = Form.useForm();
 
@@ -60,8 +61,9 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
 
     const getStudentStatusesOptions = () => {
         const potentialStudentStatuses = student.status.outgoingTransitions.map(transition => transition.targetStatus);
-        const studentStatuses = potentialStudentStatuses.concat([student.status]);
-        return studentStatuses.map(status => ({label: status.name, value: status.id}));
+        potentialStudentStatuses.push(student.status);
+        console.log(potentialStudentStatuses)
+        return potentialStudentStatuses.filter(transition => transition !== null).map(status => ({label: status.name, value: status.id}));
     }
 
     return (

@@ -235,3 +235,44 @@ Danh sách các chương trình:
 ![Danh sách các chương trình](./screenshots/Week2/program_list.png)
 
 Các chức năng tương tự cũng có đối với tình trạng sinh viên và chương trình.
+
+### **Bổ sung Business Rules** (Ex03)
+
+01. MSSV phải là duy nhất  
+   - Khi thêm hoặc cập nhật sinh viên, không được trùng MSSV với sinh viên khác.  
+![Thêm khoa mới](./screenshots/Week3/before_update.png)
+![Thêm khoa mới](./screenshots/Week3/after_update.png)
+
+02. Email phải thuộc một tên miền nhất định và có thể cấu hình động (configurable) 
+   - Ví dụ: Chỉ chấp nhận email có đuôi `@student.university.edu.vn`.  
+  - Cấu hình tên miền email, số điện thoại trong file `appsettings.json`
+![Cấu hình tên miền email, số điện thoại](./screenshots/Week3/config.png)
+    -Khi thêm hoặc cập nhật sinh viên, email phải thuộc tên miền được cấu hình
+![Thêm khoa mới](./screenshots/Week3/invalid_email.png)
+![Thêm khoa mới](./screenshots/Week3/valid_email.png)
+
+03. Số điện thoại phải có định dạng hợp lệ theo quốc gia (configurable) 
+   - Ví dụ: Việt Nam (`+84` hoặc `0[3|5|7|8|9]xxxxxxxx`).  		 
+  - Khi thêm hoặc cập nhật sinh viên, số điện thoại phải thuộc định dạng được cấu hình
+![Thêm khoa mới](./screenshots/Week3/invalid_phone.png)
+
+04. Tình trạng sinh viên chỉ có thể thay đổi theo một số quy tắc (configurable)
+   - Ví dụ:  
+     - `"Đang học"` → `"Bảo lưu"`, `"Tốt nghiệp"`, `"Đình chỉ"` (hợp lệ).  
+     - `"Đã tốt nghiệp"` không thể quay lại `"Đang học"`.
+
+    - Bấm vào nút sửa của một trạng thái, chẳng hạn là Pending
+![Thêm khoa mới](./screenshots/Week3/click_status.png)
+    - Hiện tại pending chỉ có thể chuyển qua rejected
+![Thêm khoa mới](./screenshots/Week3/pending_before_update.png)
+    - Danh sách status có thể chỉnh sửa được từ pending
+![Thêm khoa mới](./screenshots/Week3/status_list_before.png)
+    - Thêm các option mới
+![Thêm khoa mới](./screenshots/Week3/status_add.png)
+    - Cập nhật lại danh sách status
+![Thêm khoa mới](./screenshots/Week3/status_list_after.png)
+
+
+
+
+
