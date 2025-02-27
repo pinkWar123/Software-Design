@@ -272,7 +272,3 @@ Các chức năng tương tự cũng có đối với tình trạng sinh viên v
     - Cập nhật lại danh sách status
 ![Thêm khoa mới](./screenshots/Week3/status_list_after.png)
 
-
-
-
-

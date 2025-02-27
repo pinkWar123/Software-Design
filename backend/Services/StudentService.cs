@@ -23,9 +23,9 @@ namespace backend.Services
     {
         private readonly StudentSettings _studentSettings;
         private readonly StudentStatusTransitions _studentStatusTransitions;
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
         private readonly IStatusRepository _statusRepository;
-        public StudentService(ApplicationDbContext context, IOptions<StudentSettings> studentSettings, IOptions<StudentStatusTransitions> studentStatusTransitions, IStatusRepository statusRepository)
+        public StudentService(IApplicationDbContext context, IOptions<StudentSettings> studentSettings, IOptions<StudentStatusTransitions> studentStatusTransitions, IStatusRepository statusRepository)
         {
             _context = context;
             _studentSettings = studentSettings.Value;
