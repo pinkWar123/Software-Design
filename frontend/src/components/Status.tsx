@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Modal, Form, Input, message } from 'antd';
+import { Table, Button, Modal, Form, Input, message, SelectProps, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import IStatus from "../models/Status";
 import { callCreateStatus, callGetAllStatuses, callUpdateStatus } from '../services/status';
@@ -13,11 +13,20 @@ const StatusList: React.FC<StatusListProps> = ({statuses, updateStatuses}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStatus, setEditingStatus] = useState<IStatus | null>(null);
     const [form] = Form.useForm();
-
+    console.log(statuses);
     const fetchStatuses = async () => {
         const response = await callGetAllStatuses();
         updateStatuses(response);
     };
+
+    const options: SelectProps['options'] = [];
+
+    for (let i = 10; i < 36; i++) {
+    options.push({
+        value: i.toString(36) + i,
+        label: i.toString(36) + i,
+    });
+    }
 
     const columns: ColumnsType<IStatus> = [
         {
@@ -48,7 +57,7 @@ const StatusList: React.FC<StatusListProps> = ({statuses, updateStatuses}) => {
 
     const handleEdit = (status: IStatus) => {
         setEditingStatus(status);
-        form.setFieldsValue(status);
+        form.setFieldsValue({...status, outgoingTransitions: status.outgoingTransitions.map(transition => transition.targetStatusId)});
         setIsModalOpen(true);
     };
 
@@ -74,6 +83,13 @@ const StatusList: React.FC<StatusListProps> = ({statuses, updateStatuses}) => {
             message.error('Có lỗi xảy ra!');
         }
     };
+
+    const getFilteredStatuses = () => {
+        if (editingStatus) {
+            return statuses.filter(status => status.id !== editingStatus.id);
+        }
+        return statuses;
+    }
 
     return (
         <div>
@@ -116,6 +132,15 @@ const StatusList: React.FC<StatusListProps> = ({statuses, updateStatuses}) => {
                             {editingStatus ? 'Cập nhật' : 'Thêm mới'}
                         </Button>
                     </Form.Item>
+                    {editingStatus && <Form.Item name="outgoingTransitions">
+                    <Select
+                        mode="tags"
+                        style={{ width: '100%' }}
+                        placeholder="Tags Mode"
+                        onChange={(value) => console.log(value)}
+                        options={getFilteredStatuses().map(status => ({label: status.name, value: status.id}))}
+                    />
+                    </Form.Item>}
                 </Form>
             </Modal>
         </div>

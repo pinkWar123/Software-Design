@@ -21,7 +21,8 @@ namespace backend.Repositories
         {
             var statusEntity = new Status
             {
-                Name = status.Name
+                Name = status.Name,
+                OutgoingTransitions = status.OutgoingTransitions.Select(id => new StatusTransition { SourceStatusId = id }).ToList()
             };
             _context.Statuses.Add(statusEntity);
             await _context.SaveChangesAsync();
@@ -30,22 +31,36 @@ namespace backend.Repositories
 
         public async Task<IEnumerable<Status>> GetAllStatuses()
         {
-            return await _context.Statuses.ToListAsync();
+            return await _context
+            .Statuses
+            .Include(s => s.OutgoingTransitions)
+                .ThenInclude(st => st.TargetStatus)
+            .ToListAsync();
         }
 
         public async Task<Status> GetStatusById(int id)
         {
-            return await _context.Statuses.FindAsync(id);
+            return await _context
+            .Statuses
+            .Include(s => s.OutgoingTransitions)
+                .ThenInclude(st => st.TargetStatus)
+            .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<Status> UpdateStatus(int id, UpdateStatusDto status)
         {
-            var statusEntity = await _context.Statuses.FindAsync(id);
+            var statusEntity = await _context
+                .Statuses
+                .Include(s => s.OutgoingTransitions)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
             if (statusEntity == null)
             {
                 throw new Exception("Status not found");
             }
+
             statusEntity.Name = status.Name;
+
             await _context.SaveChangesAsync();
             return statusEntity;
         }

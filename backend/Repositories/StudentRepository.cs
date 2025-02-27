@@ -58,6 +58,7 @@ namespace backend.Repositories
                 .Include(s => s.Status)
                 .Include(s => s.Program)
                 .Include(s => s.Faculty)
+                .Include(s => s.Status.OutgoingTransitions)
                 .ToListAsync();
         }
 
@@ -67,6 +68,7 @@ namespace backend.Repositories
                 .Include(s => s.Status)
                 .Include(s => s.Program)
                 .Include(s => s.Faculty)
+                .Include(s => s.Status.OutgoingTransitions)
                 .FirstOrDefaultAsync(s => s.StudentId == id);
         }
 

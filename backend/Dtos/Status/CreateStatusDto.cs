@@ -8,5 +8,6 @@ namespace backend.Dtos.Status
     public class CreateStatusDto
     {
         public string Name { get; set; }
+        public List<int> OutgoingTransitions { get; set; }
     }
 }

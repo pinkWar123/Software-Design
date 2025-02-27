@@ -15,7 +15,15 @@ export const callCreateStatus = async (status: IStatus) => {
     return await axiosInstance.post('/Status', status);
 }
 
-export const callUpdateStatus = async (id: number, status: IStatus) => {
+export interface ICreateStatus {
+    id: number;
+    name: string;
+    outgoingTransitions: number[];
+}
+
+export interface IUpdateStatus extends ICreateStatus {}
+
+export const callUpdateStatus = async (id: number, status: IUpdateStatus) => {
     return await axiosInstance.put(`/Status/${id}`, status);
 }
 

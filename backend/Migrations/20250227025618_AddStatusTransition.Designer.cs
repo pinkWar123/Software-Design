@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -10,9 +11,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227025618_AddStatusTransition")]
+    partial class AddStatusTransition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -132,21 +135,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.StatusTransition", b =>
                 {
-                    b.HasOne("backend.Entities.Status", "SourceStatus")
+                    b.HasOne("backend.Entities.Status", null)
                         .WithMany("OutgoingTransitions")
-                        .HasForeignKey("SourceStatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("backend.Entities.Status", "TargetStatus")
-                        .WithMany()
                         .HasForeignKey("TargetStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("SourceStatus");
-
-                    b.Navigation("TargetStatus");
                 });
 
             modelBuilder.Entity("backend.Entities.Student", b =>

@@ -58,6 +58,12 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
         }
     };
 
+    const getStudentStatusesOptions = () => {
+        const potentialStudentStatuses = student.status.outgoingTransitions.map(transition => transition.targetStatus);
+        const studentStatuses = potentialStudentStatuses.concat([student.status]);
+        return studentStatuses.map(status => ({label: status.name, value: status.id}));
+    }
+
     return (
         <Modal
             title="Cập nhật thông tin sinh viên"
@@ -149,9 +155,9 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
                 >
                     <Select>
-                        {statuses.map(status => (
-                            <Select.Option key={status.id} value={status.id}>
-                                {status.name}
+                        {getStudentStatusesOptions().map(status => (
+                            <Select.Option key={status.value} value={status.value}>
+                                {status.label}
                             </Select.Option>
                         ))}
                     </Select>

@@ -91,11 +91,11 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             rules={[{ required: true, message: 'Vui lòng chọn khoa!' }]}
           >
             <Select>
-              {faculties?.map(faculty => (
+              {faculties.length > 0 ? faculties.map(faculty => (
                 <Select.Option key={faculty.id} value={faculty.id}>
                   {faculty.name}
                 </Select.Option>
-              ))}
+              )) : []}
             </Select>
           </Form.Item>
           <Form.Item
@@ -118,11 +118,11 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             rules={[{ required: true, message: 'Vui lòng chọn chương trình học!' }]}
           >
             <Select>
-              {studyPrograms?.map(program => (
+              {studyPrograms.length > 0 ? studyPrograms.map(program => (
                 <Select.Option key={program.id} value={program.id}>
                   {program.name}
                 </Select.Option>
-              ))}
+              )) : []}
             </Select>
           </Form.Item>
           <Form.Item
@@ -131,11 +131,11 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
           >
             <Select>
-              {statuses?.map(status => (
+              {statuses.length > 0 ? statuses.map(status => (
                 <Select.Option key={status.id} value={status.id}>
                   {status.name}
                 </Select.Option>
-              ))}
+              )) : []}
             </Select>
           </Form.Item>
           <Form.Item

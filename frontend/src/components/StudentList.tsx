@@ -248,10 +248,10 @@ Nguyễn Văn A,2000-01-15,Male,K15,123 Đường ABC,nguyenvana@example.com,012
                         allowClear
                         style={{ width: 200 }}
                         onChange={handleFacultyChange}
-                        options={faculties.map(faculty => ({
+                        options={faculties.length > 0 ? faculties.map(faculty => ({
                             label: faculty.name,
                             value: faculty.id
-                        }))}
+                        })) : []}
                     />
                 <StudentCreateModal studyPrograms={studyPrograms} statuses={statuses} faculties={faculties} updateStudents={updateStudents} />
                 {selectedStudent && (
