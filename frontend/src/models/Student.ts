@@ -17,6 +17,7 @@ interface IStudent {
     faculty: IFaculty;
     program: IProgram;
     status: IStatus;
+    createdAt: string;
 }
 
 // - Mã số sinh viên

@@ -25,12 +25,19 @@ namespace backend.Services
         private readonly StudentStatusTransitions _studentStatusTransitions;
         private readonly IApplicationDbContext _context;
         private readonly IStatusRepository _statusRepository;
-        public StudentService(IApplicationDbContext context, IOptions<StudentSettings> studentSettings, IOptions<StudentStatusTransitions> studentStatusTransitions, IStatusRepository statusRepository)
+        private readonly IConfigurationRepository _configurationRepository;
+        public StudentService(
+            IApplicationDbContext context, 
+            IOptions<StudentSettings> studentSettings, 
+            IOptions<StudentStatusTransitions> studentStatusTransitions, 
+            IStatusRepository statusRepository,
+            IConfigurationRepository configurationRepository)
         {
             _context = context;
             _studentSettings = studentSettings.Value;
             _studentStatusTransitions = studentStatusTransitions.Value;
             _statusRepository = statusRepository;
+            _configurationRepository = configurationRepository;
         }
 
         public async Task ImportFromCsv(Stream stream)
@@ -182,10 +189,19 @@ namespace backend.Services
 
         public async Task<Student> CreateNewStudent(CreateStudentDto student)
         {
-            if (!ValidatePhone(student.PhoneNumber))
-                throw new Exception("Số điện thoại không hợp lệ");
-            if (!ValidateEmail(student.Email))
-                throw new Exception("Email không hợp lệ");
+            var shouldPhoneValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedPhonePattern");
+            if (shouldPhoneValidationBeApplied != null && shouldPhoneValidationBeApplied.IsActive)
+            {
+                if (!ValidatePhone(student.PhoneNumber))
+                    throw new Exception("Số điện thoại không hợp lệ");
+            }
+
+            var shouldEmailValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedEmailDomain");
+            if (shouldEmailValidationBeApplied != null && shouldEmailValidationBeApplied.IsActive)
+            {
+                if (!ValidateEmail(student.Email))
+                    throw new Exception("Email không hợp lệ");
+            }
             var existingStudent = await GetStudentById(student.StudentId);
             if (existingStudent != null)
                 throw new Exception("Mã sinh viên đã tồn tại");
@@ -258,14 +274,23 @@ namespace backend.Services
 
         public async Task<Student?> UpdateStudent(int studentId, UpdateStudentDto student)
         {
+
             var existingStudent = await GetStudentById(studentId);
             if (existingStudent == null)
                 throw new Exception("Không tìm thấy sinh viên");
-            if (!ValidatePhone(student.PhoneNumber))
-                throw new Exception("Số điện thoại không hợp lệ");
-            if (!ValidateEmail(student.Email))
-                throw new Exception("Email không hợp lệ");
-            
+            var shouldPhoneValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedPhonePattern");
+            if (shouldPhoneValidationBeApplied != null && shouldPhoneValidationBeApplied.IsActive)
+            {
+                if (!ValidatePhone(student.PhoneNumber))
+                    throw new Exception("Số điện thoại không hợp lệ");
+            }
+
+            var shouldEmailValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedEmailDomain");
+            if (shouldEmailValidationBeApplied != null && shouldEmailValidationBeApplied.IsActive)
+            {
+                if (!ValidateEmail(student.Email))
+                    throw new Exception("Email không hợp lệ");
+            }
             if(student.StudentId != studentId)
             {
                 var anotherStudent = await GetStudentById(student.StudentId);

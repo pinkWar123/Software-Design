@@ -31,7 +31,8 @@ namespace backend.Repositories
                 PhoneNumber = student.PhoneNumber,
                 FacultyId = student.FacultyId,
                 StatusId = student.StatusId,
-                ProgramId = student.ProgramId
+                ProgramId = student.ProgramId,
+                CreatedAt = DateTime.UtcNow
             };
 
             await _context.Students.AddAsync(newStudent);
