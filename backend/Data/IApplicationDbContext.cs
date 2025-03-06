@@ -14,6 +14,7 @@ namespace backend.Data
         DbSet<StudyProgram> StudyPrograms { get; set; }
         DbSet<Status> Statuses { get; set; }
         DbSet<StatusTransition> StatusTransitions { get; set; }
+        DbSet<Configuration> Configurations { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

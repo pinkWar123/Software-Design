@@ -36,6 +36,15 @@ namespace backend.Data
                     .WithMany() // or .WithMany(s => s.IncomingTransitions) if you add that navigation property
                     .HasForeignKey(st => st.TargetStatusId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                modelBuilder.Entity<Configuration>(c => 
+                {
+                    c.HasData(
+                        new Configuration { Id = 1, Key = "AllowedEmailDomain", Value = "student.university.edu.vn", IsActive = true },
+                        new Configuration { Id = 2, Key = "AllowedPhonePhoneNumberPattern", Value = "^0[35789]\\d{8}$", IsActive = true },
+                        new Configuration { Id = 3, Key = "AllowedStudentStatusTransition", Value = "", IsActive = true }
+                    );
+                });
         }
 
         public DbSet<Student> Students { get; set; }
@@ -44,5 +53,6 @@ namespace backend.Data
         public DbSet<Faculty> Faculties { get; set; }
 
         public DbSet<StatusTransition> StatusTransitions { get; set; }
+        public DbSet<Configuration> Configurations { get; set; }
     }
 }
