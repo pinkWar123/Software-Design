@@ -16,6 +16,7 @@ using backend.Settings;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 using backend.Repositories;
+using MimeKit;
 
 namespace backend.Services
 {
@@ -24,20 +25,25 @@ namespace backend.Services
         private readonly StudentSettings _studentSettings;
         private readonly StudentStatusTransitions _studentStatusTransitions;
         private readonly IApplicationDbContext _context;
-        private readonly IStatusRepository _statusRepository;
+        private readonly IMailService _mailService;
+        private readonly IStudentRepository _studentRepository;
+        
         private readonly IConfigurationRepository _configurationRepository;
         public StudentService(
             IApplicationDbContext context, 
             IOptions<StudentSettings> studentSettings, 
-            IOptions<StudentStatusTransitions> studentStatusTransitions, 
-            IStatusRepository statusRepository,
-            IConfigurationRepository configurationRepository)
+            IOptions<StudentStatusTransitions> studentStatusTransitions,
+            IMailService mailService,
+            IConfigurationRepository configurationRepository,
+            IStudentRepository studentRepository
+            )
         {
             _context = context;
             _studentSettings = studentSettings.Value;
             _studentStatusTransitions = studentStatusTransitions.Value;
-            _statusRepository = statusRepository;
+            _mailService = mailService;
             _configurationRepository = configurationRepository;
+            _studentRepository = studentRepository;
         }
 
         public async Task ImportFromCsv(Stream stream)
@@ -273,11 +279,27 @@ namespace backend.Services
         }
 
         public async Task<Student?> UpdateStudent(int studentId, UpdateStudentDto student)
-        {
-
-            var existingStudent = await GetStudentById(studentId);
+        {  
+            Console.WriteLine(student.FullName);
+            var existingStudent = await _studentRepository.GetStudentByIdAsync(studentId);
+            if (existingStudent != null)
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(
+                    existingStudent, 
+                    new System.Text.Json.JsonSerializerOptions 
+                    { 
+                        WriteIndented = true, 
+                        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles 
+                    });
+                Console.WriteLine(json);
+            }
+            else
+            {
+                Console.WriteLine("Student not found.");
+            }
             if (existingStudent == null)
                 throw new Exception("Không tìm thấy sinh viên");
+
             var shouldPhoneValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedPhonePattern");
             if (shouldPhoneValidationBeApplied != null && shouldPhoneValidationBeApplied.IsActive)
             {
@@ -305,11 +327,65 @@ namespace backend.Services
             existingStudent.Address = student.Address;
             existingStudent.Email = student.Email;
             existingStudent.PhoneNumber = student.PhoneNumber;
-            existingStudent.StatusId = student.StatusId;
             existingStudent.ProgramId = student.ProgramId;
             existingStudent.FacultyId = student.FacultyId;
 
+            if(existingStudent.StatusId != student.StatusId)
+            {
+                Console.WriteLine("Trạng thái mới: " + student.StatusId);
+                var suscribeTo = existingStudent.SubscribeToNotifications;
+                if(suscribeTo != null && suscribeTo.Any(x => x.Type == NotificationType.Email))
+                {
+                    var message = new Message(new List<string>()
+                    {
+                        existingStudent.Email
+                    },
+                    "Trạng thái sinh viên thay đổi",
+                    $"Trạng thái của sinh viên {existingStudent.FullName} đã được thay đổi thành {student.StatusId}"
+                    );
+                    await _mailService.SendEmailAsync(message);
+                }
+            }
+            existingStudent.StatusId = student.StatusId;
+            
+            // var existingNotifications = existingStudent.SubscribeToNotifications?
+            //                     .Select(s => s.Type)
+            //                     .ToList() ?? new List<NotificationType>();
+
+            var newNotifications = student.SubscribeTo ?? new List<NotificationType>();
+
+            // var notificationsToAdd = newNotifications.Except(existingNotifications).ToList();
+            // var notificationsToRemove = existingNotifications.Except(newNotifications).ToList();
+
+            // if(existingStudent.SubscribeToNotifications == null || !existingStudent.SubscribeToNotifications.Any())
+            // {
+            //     existingStudent.SubscribeToNotifications = new List<StudentNotification>();
+            // }
+
+            // Console.WriteLine("Existing Notifications: " + string.Join(", ", existingNotifications));
+            // Console.WriteLine("New Notifications: " + string.Join(", ", newNotifications));
+            // Console.WriteLine("Notifications to Add: " + string.Join(", ", notificationsToAdd));
+            // Console.WriteLine("Notifications to Remove: " + string.Join(", ", notificationsToRemove));
+
+            // existingStudent.SubscribeToNotifications?.RemoveAll(s => notificationsToRemove.Contains(s.Type));
+            // existingStudent.SubscribeToNotifications?.AddRange(notificationsToAdd.Select(n => new StudentNotification
+            // {
+            //     Type = n,
+            //     Student = existingStudent,
+            //     StudentId = student.StudentId
+            // }).ToList());
+
+            existingStudent.SubscribeToNotifications.Clear();
+            existingStudent.SubscribeToNotifications.AddRange(
+                newNotifications.Select(n => new StudentNotification {
+                    Type = n,
+                    Student = existingStudent,
+                    StudentId = studentId
+                }));
+
+
             await _context.SaveChangesAsync();
+            Console.WriteLine("UpdateStudent");
             return existingStudent;
         }
     }

@@ -103,8 +103,12 @@ function App() {
       <FacultyList faculties={faculties} updateFaculties={setFaculties}/>
       <Program programs={studyPrograms} updatePrograms={setStudyPrograms}/>
       <Status statuses={statuses} updateStatuses={setStatuses}/>
-      <Configuration configurations={configurations} updateConfigurations={setConfigurations}/>
-      <VersionInfo />
+      <div style={{paddingBottom: '200px'}}>
+        <Configuration configurations={configurations} updateConfigurations={setConfigurations}/>
+
+    </div>
+        <VersionInfo />
+      
     </>
     </AntdApp>
   )

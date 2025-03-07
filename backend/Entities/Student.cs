@@ -23,6 +23,7 @@ namespace backend.Entities
         public Status Status { get; set; }     // Tình trạng sinh viên
         public StudyProgram Program { get; set; }    // Chương trình
         public Faculty Faculty { get; set; }
+        public List<StudentNotification> SubscribeToNotifications { get; set; } = new List<StudentNotification>();
         public DateTime CreatedAt { get; set; }
     }
 }

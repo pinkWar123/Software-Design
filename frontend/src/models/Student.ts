@@ -1,7 +1,10 @@
+import { IStudentNotification } from "../enums/notification";
 import IFaculty from "./Faculty";
 import IProgram from "./Program";
 import IStatus from "./Status";
-
+interface StudentNotification {
+    type: IStudentNotification;
+}
 interface IStudent {
     studentId: number;
     fullName: string;
@@ -17,6 +20,7 @@ interface IStudent {
     faculty: IFaculty;
     program: IProgram;
     status: IStatus;
+    subscribeToNotifications: StudentNotification[];
     createdAt: string;
 }
 

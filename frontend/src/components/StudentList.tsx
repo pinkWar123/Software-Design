@@ -1,4 +1,4 @@
-import { Space, Table, Input, Select, Upload, Button, App } from 'antd';
+import { Space, Table, Input, Select, Upload, Button, App, Checkbox } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import IStudent from '../models/Student';
 import React, { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import IFaculty from '../models/Faculty';
 import type { UploadProps } from 'antd';
+import { IStudentNotification } from '../enums/notification';
 const { Search } = Input;
 
 interface StudentListProps {
@@ -19,6 +20,12 @@ interface StudentListProps {
     faculties: IFaculty[];
     updateStudents: () => Promise<void>;
 }
+
+const notificationOptions = [
+    { label: 'Email', value: IStudentNotification.Email },
+    { label: 'SMS', value: IStudentNotification.SMS },
+    { label: 'Zalo', value: IStudentNotification.Zalo },
+  ];
 
 const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, statuses, faculties, updateStudents}) => {
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -69,6 +76,12 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
         });
         setFilteredStudents(filtered);
     };
+    const renderNotificationOptions = (value: IStudentNotification[]) => (
+        <Checkbox.Group
+          options={notificationOptions}
+          value={value}
+        />
+      );
     const columns: ColumnsType<IStudent> = [
       {
         title: 'Mã sinh viên',
@@ -119,6 +132,13 @@ const StudentList : React.FC<StudentListProps> = ({students, studyPrograms, stat
         title: 'Trạng thái',
         dataIndex: ['status', 'name'],
         key: 'status',
+      },
+      {
+        title: 'Hình thức nhận thông báo',
+        dataIndex: 'subscribeToNotifications',
+        key: 'notification',
+        render: (value: IStudentNotification[]) => 
+            renderNotificationOptions(value)
       },
       {
         title: 'Thao tác',

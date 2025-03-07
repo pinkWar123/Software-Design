@@ -1,3 +1,4 @@
+import { IStudentNotification } from "../enums/notification";
 import IStudent from "../models/Student";
 import axiosInstance from "./axios.config";
 
@@ -15,6 +16,7 @@ export interface CreateStudentDto {
     phoneNumber: string;   // Số điện thoại liên hệ
     statusId: number;
     programId: number;
+    subscribeTo: IStudentNotification[];
 }
 
 // ... existing code ...

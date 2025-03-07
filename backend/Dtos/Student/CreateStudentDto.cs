@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Entities;
 
 namespace backend.Dtos.Student
 {
@@ -18,5 +19,6 @@ namespace backend.Dtos.Student
         public int StatusId { get; set; }
         public int ProgramId { get; set; }
         public int FacultyId { get; set; }    // Khoa
+        public List<NotificationType> SubscribeTo { get; set; }
     }
 }

@@ -11,9 +11,9 @@ namespace backend.Repositories
 {
     public class StudentRepository : IStudentRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
 
-        public StudentRepository(ApplicationDbContext context)
+        public StudentRepository(IApplicationDbContext context)
         {
             _context = context;
         }
@@ -59,6 +59,7 @@ namespace backend.Repositories
                 .Include(s => s.Status)
                 .Include(s => s.Program)
                 .Include(s => s.Faculty)
+                .Include(s => s.SubscribeToNotifications)
                 .Include(s => s.Status.OutgoingTransitions)
                 .ToListAsync();
         }
@@ -70,6 +71,7 @@ namespace backend.Repositories
                 .Include(s => s.Program)
                 .Include(s => s.Faculty)
                 .Include(s => s.Status.OutgoingTransitions)
+                .Include(s => s.SubscribeToNotifications)
                 .FirstOrDefaultAsync(s => s.StudentId == id);
         }
 

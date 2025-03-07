@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Select, DatePicker, Button, message, App } from 'antd';
+import { Modal, Form, Input, Select, DatePicker, Button, message, App, Checkbox } from 'antd';
 import { useEffect } from 'react';
 import { callUpdateStudent } from '../services/student';
 import IStudent from '../models/Student';
@@ -7,6 +7,8 @@ import IStatus from '../models/Status';
 import dayjs from 'dayjs';
 import IFaculty from '../models/Faculty';
 import { ValidationError } from '../helpers/errors';
+import StudentNotifications from './StudenttNotifications';
+import { notificationOptions } from '../constants/notificationOptions';
 interface StudentUpdateModalProps {
     student: IStudent | null;
     studyPrograms: IProgram[];
@@ -33,22 +35,29 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
 
     useEffect(() => {
         if (student) {
+            console.log(student)
             form.setFieldsValue({
                 ...student,
                 dateOfBirth: dayjs(student.dateOfBirth),
                 programId: student.program.id,
-                statusId: student.status.id
+                statusId: student.status.id,
+                subscribeToNotifications: student.subscribeToNotifications.map(s => s.type) ?? []
             });
         }
     }, [student, form]);
 
     const handleSubmit = async (values: any) => {
         try {
+            console.log(values)
             const updatedStudent = await callUpdateStudent(student.studentId, {
                 ...values,
-                dateOfBirth: values.dateOfBirth
+                dateOfBirth: values.dateOfBirth,
+                subscribeTo: values.subscribeToNotifications
             });
-            console.log(updatedStudent);
+            console.log({
+                ...values,
+                dateOfBirth: values.dateOfBirth,
+            });
             message.success('Cập nhật sinh viên thành công!');
             await updateStudents();
             onClose();
@@ -180,6 +189,11 @@ const StudentUpdateModal: React.FC<StudentUpdateModalProps> = ({
                     rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
                 >
                     <Input />
+                </Form.Item>
+                <Form.Item name="subscribeToNotifications" label="Nhận thông báo qua">
+                    <Checkbox.Group
+                        options={notificationOptions} 
+                    />
                 </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit">

@@ -37,6 +37,18 @@ namespace backend.Data
                     .HasForeignKey(st => st.TargetStatusId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                modelBuilder.Entity<Student>()
+                    .HasMany(st => st.SubscribeToNotifications)
+                    .WithOne(sn => sn.Student)
+                    .IsRequired(false);
+
+                modelBuilder.Entity<StudentNotification>()
+                .HasOne(sn => sn.Student)
+                .WithMany(s => s.SubscribeToNotifications)
+                .HasForeignKey(sn => sn.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
                 modelBuilder.Entity<Configuration>(c => 
                 {
                     c.HasData(

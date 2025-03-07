@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Button, Modal, Form, Input, Select, DatePicker, message, App } from 'antd';
+import { Button, Modal, Form, Input, Select, DatePicker, message, App, Checkbox } from 'antd';
 import { callCreateStudent } from '../services/student';
 import IProgram from '../models/Program';
 import IStatus from '../models/Status';
 import IFaculty from '../models/Faculty';
 import { ValidationError } from '../helpers/errors';
+import StudentNotifications from './StudenttNotifications';
+import { notificationOptions } from '../constants/notificationOptions';
 interface StudentCreateModalProps {
     studyPrograms: IProgram[];
     statuses: IStatus[];
@@ -159,6 +161,11 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
             <Button type="primary" htmlType="submit">
               Tạo mới
             </Button>
+          </Form.Item>
+          <Form.Item name="subscribeToNotifications" label="Nhận thông báo qua">
+            <Checkbox.Group
+              options={notificationOptions} 
+            />
           </Form.Item>
         </Form>
       </Modal>
