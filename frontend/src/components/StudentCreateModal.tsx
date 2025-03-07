@@ -31,11 +31,16 @@ const StudentCreateModal: React.FC<StudentCreateModalProps> = ({ studyPrograms, 
 
   const handleSubmit = async (values: any) => {
     try {
-      await callCreateStudent(values);
+      await callCreateStudent({
+        ...values,
+        dateOfBirth: values.dateOfBirth,
+        subscribeTo: values.subscribeToNotifications
+    });
       message.success('Tạo học sinh mới thành công!');
       handleCancel();
       await updateStudents();
     } catch (error) {
+      console.log(error);
       const _error = error as ValidationError;
       message.error(_error?.response?.data?.title ?? "Có lỗi xảy ra khi tạo học sinh mới");
     }

@@ -225,6 +225,7 @@ namespace backend.Services
                 StatusId = student.StatusId,
                 ProgramId = student.ProgramId,
                 FacultyId = student.FacultyId,
+                CreatedAt = DateTime.UtcNow
             };
 
             await _context.Students.AddAsync(newStudent);
@@ -387,6 +388,31 @@ namespace backend.Services
             await _context.SaveChangesAsync();
             Console.WriteLine("UpdateStudent");
             return existingStudent;
+        }
+
+        public async Task<bool> DeleteStudent(int id)
+        {
+            var hasStudentExisted = await GetStudentById(id);
+            if(hasStudentExisted == null) return false;
+
+            var config = await _configurationRepository.GetConfigurationByKeyAsync("AllowedDeleteStudentTime");
+            if(config == null) return false;
+
+            if(config.IsActive)
+            {
+                var allowedTime = int.Parse(config.Value);
+                var currentTime = DateTime.UtcNow;
+                var studentTime = hasStudentExisted.CreatedAt;
+
+                if(currentTime.Subtract(studentTime).TotalMinutes > allowedTime)
+                {
+                    throw new Exception("Không thể xóa sinh viên sau thời gian quy định");
+                }
+            }
+
+            _context.Students.Remove(hasStudentExisted);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 

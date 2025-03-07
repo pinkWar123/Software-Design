@@ -64,7 +64,7 @@ namespace backend.Controllers
         {
             try
             {
-                await _studentRepository.DeleteStudentAsync(id);
+                await _studentService.DeleteStudent(id);
                 await _loggingService.LogAsync(
                     "DeleteStudent",
                     $"Deleted student ID: {id}"
@@ -199,5 +199,7 @@ namespace backend.Controllers
                 return BadRequest($"Export failed: {ex.Message}");
             }
         }
+
+        
     }
 }

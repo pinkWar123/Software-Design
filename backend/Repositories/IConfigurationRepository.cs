@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Dtos.Configuration;
 using backend.Entities;
 
 namespace backend.Repositories
@@ -13,5 +14,6 @@ namespace backend.Repositories
         Task<bool> ActivateConfiguration(string key);
         Task<bool> DeactivateConfiguration(string key);
         Task<List<Configuration>> GetAllConfigurationsAsync();
+        Task CreateConfiguration(CreateConfigurationDto configuration);
     }
 }

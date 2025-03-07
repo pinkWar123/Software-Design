@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Data;
+using backend.Dtos.Configuration;
 using backend.Entities;
 using backend.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -56,5 +57,19 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
             return Ok();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateConfiguration([FromBody] CreateConfigurationDto createConfigurationDto)
+        {
+            try
+            {
+                await _configurationRepository.CreateConfiguration(createConfigurationDto);
+                return Created();
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }   
     }
 }
