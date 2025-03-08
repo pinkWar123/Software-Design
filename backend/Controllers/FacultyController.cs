@@ -14,12 +14,17 @@ namespace backend.Controllers
     public class FacultyController : ControllerBase
     {
         private readonly IFacultyRepository _facultyRepository;
+        private readonly IFacultyService _facultyService;
         private readonly ILoggingService _loggingService;
 
-        public FacultyController(IFacultyRepository facultyRepository, ILoggingService loggingService)
+        public FacultyController(
+            IFacultyRepository facultyRepository, 
+            ILoggingService loggingService,
+            IFacultyService facultyService)
         {
             _facultyRepository = facultyRepository;
             _loggingService = loggingService;
+            _facultyService = facultyService;
         }
 
         [HttpGet]
@@ -72,6 +77,27 @@ namespace backend.Controllers
             catch (Exception ex)
             {
                 await _loggingService.LogAsync("Error", $"Failed to create faculty: {ex.Message}");
+                throw;
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteFaculty(int id)
+        {
+            try
+            {
+                var success = await _facultyService.DeleteFaculty(id);
+                if (!success)
+                {
+                    await _loggingService.LogAsync("Error", $"Failed to delete faculty: {id}");
+                    return BadRequest();
+                }
+                await _loggingService.LogAsync("DeleteFaculty", $"Deleted faculty: {id}");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await _loggingService.LogAsync("Error", $"Failed to delete faculty {id}: {ex.Message}");
                 throw;
             }
         }

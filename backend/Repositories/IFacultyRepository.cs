@@ -13,6 +13,7 @@ namespace backend.Repositories
         Task<Faculty> GetFacultyById(int id);
         Task<Faculty> CreateFaculty(CreateFacultyDto faculty);
         Task<Faculty> UpdateFaculty(int id, UpdateFacultyDto faculty);
-        // Task<bool> DeleteFaculty(int id);
+        Task<int> GetStudentCountInFaculty(int id);
+        Task<bool> DeleteFaculty(Faculty faculty);
     }
 }

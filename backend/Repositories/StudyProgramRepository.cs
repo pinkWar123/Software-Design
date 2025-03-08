@@ -29,9 +29,20 @@ namespace backend.Repositories
             return studyProgramEntity;
         }
 
+        public Task DeleteStudyProgram(StudyProgram studyProgram)
+        {
+            _context.StudyPrograms.Remove(studyProgram);
+            return _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<StudyProgram>> GetAllStudyPrograms()
         {
             return await _context.StudyPrograms.ToListAsync();
+        }
+
+        public async Task<int> GetStudentCountInStudyProgram(int id)
+        {
+            return await _context.Students.CountAsync(s => s.ProgramId == id); 
         }
 
         public async Task<StudyProgram> GetStudyProgramById(int id)

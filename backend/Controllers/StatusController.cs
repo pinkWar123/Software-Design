@@ -16,12 +16,17 @@ namespace backend.Controllers
     public class StatusController : ControllerBase
     {
         private readonly IStatusRepository _statusRepository;
+        private readonly IStatusService _statusService;
         private readonly ILoggingService _loggingService;
 
-        public StatusController(IStatusRepository statusRepository, ILoggingService loggingService)
+        public StatusController(
+            IStatusRepository statusRepository, 
+            ILoggingService loggingService,
+            IStatusService statusService)
         {
             _statusRepository = statusRepository;
             _loggingService = loggingService;
+            _statusService = statusService;
         }
 
         [HttpGet]
@@ -74,6 +79,27 @@ namespace backend.Controllers
             catch (Exception ex)
             {
                 await _loggingService.LogAsync("Error", $"Failed to create status: {ex.Message}");
+                throw;
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStatus([FromRoute] int id)
+        {
+            try
+            {
+                var isDeleteSuccessful = await _statusService.DeleteStatus(id);
+                if (!isDeleteSuccessful)
+                {
+                    await _loggingService.LogAsync("Error", $"Failed to delete status {id}");
+                    return BadRequest("Lỗi xóa trạng thái");
+                }
+                await _loggingService.LogAsync("DeleteStatus", $"Deleted status: {id}");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await _loggingService.LogAsync("Error", $"Failed to delete status {id}: {ex.Message}");
                 throw;
             }
         }

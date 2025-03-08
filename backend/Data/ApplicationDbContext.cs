@@ -35,7 +35,7 @@ namespace backend.Data
                     .HasOne(st => st.TargetStatus)
                     .WithMany() // or .WithMany(s => s.IncomingTransitions) if you add that navigation property
                     .HasForeignKey(st => st.TargetStatusId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 modelBuilder.Entity<Student>()
                     .HasMany(st => st.SubscribeToNotifications)

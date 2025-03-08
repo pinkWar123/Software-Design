@@ -16,12 +16,17 @@ namespace backend.Controllers
     public class StudyProgramController : ControllerBase
     {
         private readonly IStudyProgramRepository _studyProgramRepository;
+        private readonly IProgramService _programService;
         private readonly ILoggingService _loggingService;
 
-        public StudyProgramController(IStudyProgramRepository studyProgramRepository, ILoggingService loggingService)
+        public StudyProgramController(
+            IStudyProgramRepository studyProgramRepository, 
+            ILoggingService loggingService,
+            IProgramService programService)
         {
             _studyProgramRepository = studyProgramRepository;
             _loggingService = loggingService;
+            _programService = programService;
         }
         
         [HttpGet]
@@ -74,6 +79,27 @@ namespace backend.Controllers
             catch (Exception ex)
             {
                 await _loggingService.LogAsync("Error", $"Failed to create study program: {ex.Message}");
+                throw;
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudyProgram(int id)
+        {
+            try
+            {
+                var isDeleteSuccessful = await _programService.DeleteProgram(id);
+                if (!isDeleteSuccessful)
+                {
+                    await _loggingService.LogAsync("Error", $"Failed to delete study program {id}");
+                    return BadRequest();
+                }
+                await _loggingService.LogAsync("DeleteStudyProgram", $"Deleted study program: {id}");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await _loggingService.LogAsync("Error", $"Failed to delete study program {id}: {ex.Message}");
                 throw;
             }
         }

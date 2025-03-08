@@ -29,6 +29,13 @@ namespace backend.Repositories
             return newFaculty;
         }
 
+        public async Task<bool> DeleteFaculty(Faculty faculty)
+        {
+            _context.Faculties.Remove(faculty);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<IEnumerable<Faculty>> GetFaculties()
         {
             return await _context.Faculties.ToListAsync();
@@ -37,6 +44,11 @@ namespace backend.Repositories
         public async Task<Faculty> GetFacultyById(int id)
         {
             return await _context.Faculties.FindAsync(id);
+        }
+
+        public async Task<int> GetStudentCountInFaculty(int id)
+        {
+            return await _context.Students.CountAsync(s => s.FacultyId == id);
         }
 
         public async Task<Faculty> UpdateFaculty(int id, UpdateFacultyDto faculty)

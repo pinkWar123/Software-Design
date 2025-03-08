@@ -83,6 +83,9 @@ builder.Services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddSingleton<ILoggingService, LoggingService>();
 builder.Services.AddSingleton<IMailService, MailService>();
+builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<IFacultyService, FacultyService>();
+builder.Services.AddScoped<IProgramService, ProgramService>();
 
 builder.Services.Configure<StudentSettings>(builder.Configuration.GetSection("Rules:Student"));
 builder.Services.Configure<StudentStatusTransitions>(builder.Configuration.GetSection("Rules:StudentStatusTransitions"));
