@@ -61,6 +61,7 @@ namespace backend.Repositories
             var hasConfigurationExisted = await GetConfigurationByKeyAsync(configuration.Key);
             if(hasConfigurationExisted == null) return false;
             hasConfigurationExisted.Value = configuration.Value;
+            await _context.SaveChangesAsync();
             return true;
         }
     }

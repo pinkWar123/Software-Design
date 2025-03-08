@@ -46,14 +46,15 @@ namespace backend.Controllers
             return Ok();
         }
 
-        [HttpPut("{key}/value")]
+        [HttpPut("{key}")]
         public async Task<IActionResult> UpdateConfigurationValue([FromRoute] string key, [FromBody] string newValue)
         {
+            Console.WriteLine("New value: " + newValue);
             var configuration = await _configurationRepository.GetConfigurationByKeyAsync(key);
             if(configuration == null) return NotFound();
             configuration.Value = newValue;
             var isUpdated = await _configurationRepository.UpdateConfiguration(configuration);
-            if (!isUpdated) return NotFound();
+            if (!isUpdated) return Conflict();
             await _context.SaveChangesAsync();
             return Ok();
         }
