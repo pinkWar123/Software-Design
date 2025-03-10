@@ -2,7 +2,10 @@ using backend.Data;
 using backend.Middlewares;
 using backend.Repositories;
 using backend.Services;
+using backend.Services.DocumentGeneration;
 using backend.Settings;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -28,7 +31,8 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>())
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .WithExposedHeaders("Content-Disposition");;
         });
 });
 
@@ -86,9 +90,13 @@ builder.Services.AddSingleton<IMailService, MailService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
 builder.Services.AddScoped<IFacultyService, FacultyService>();
 builder.Services.AddScoped<IProgramService, ProgramService>();
-
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
 builder.Services.Configure<StudentSettings>(builder.Configuration.GetSection("Rules:Student"));
 builder.Services.Configure<StudentStatusTransitions>(builder.Configuration.GetSection("Rules:StudentStatusTransitions"));
+builder.Services.AddSingleton(new SynchronizedConverter(new PdfTools()));
+    // Register the DocumentGeneratorFactory as a service
+builder.Services.AddTransient<IDocumentGeneratorFactory, DocumentGeneratorFactory>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
