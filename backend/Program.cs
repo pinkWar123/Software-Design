@@ -4,6 +4,7 @@ using backend.Repositories;
 using backend.Services;
 using backend.Services.DocumentGeneration;
 using backend.Settings;
+using backend.Validation.Student;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.EntityFrameworkCore;
@@ -91,6 +92,8 @@ builder.Services.AddScoped<IStatusService, StatusService>();
 builder.Services.AddScoped<IFacultyService, FacultyService>();
 builder.Services.AddScoped<IProgramService, ProgramService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+
+builder.Services.AddScoped<IStudentValidationService, StudentValidationService>();
 builder.Services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
 builder.Services.Configure<StudentSettings>(builder.Configuration.GetSection("Rules:Student"));
 builder.Services.Configure<StudentStatusTransitions>(builder.Configuration.GetSection("Rules:StudentStatusTransitions"));

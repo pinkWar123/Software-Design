@@ -17,12 +17,13 @@ using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 using backend.Repositories;
 using MimeKit;
+using backend.Validation.Student;
 
 namespace backend.Services
 {
     public class StudentService : IStudentService
     {
-        private readonly StudentSettings _studentSettings;
+        private readonly IStudentValidationService _validator;
         private readonly StudentStatusTransitions _studentStatusTransitions;
         private readonly IApplicationDbContext _context;
         private readonly IMailService _mailService;
@@ -31,7 +32,7 @@ namespace backend.Services
         private readonly IConfigurationRepository _configurationRepository;
         public StudentService(
             IApplicationDbContext context, 
-            IOptions<StudentSettings> studentSettings, 
+            IStudentValidationService validator, 
             IOptions<StudentStatusTransitions> studentStatusTransitions,
             IMailService mailService,
             IConfigurationRepository configurationRepository,
@@ -39,7 +40,7 @@ namespace backend.Services
             )
         {
             _context = context;
-            _studentSettings = studentSettings.Value;
+            _validator = validator;
             _studentStatusTransitions = studentStatusTransitions.Value;
             _mailService = mailService;
             _configurationRepository = configurationRepository;
@@ -195,19 +196,7 @@ namespace backend.Services
 
         public async Task<Student> CreateNewStudent(CreateStudentDto student)
         {
-            var shouldPhoneValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedPhonePattern");
-            if (shouldPhoneValidationBeApplied != null && shouldPhoneValidationBeApplied.IsActive)
-            {
-                if (!ValidatePhone(student.PhoneNumber))
-                    throw new Exception("Số điện thoại không hợp lệ");
-            }
-
-            var shouldEmailValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedEmailDomain");
-            if (shouldEmailValidationBeApplied != null && shouldEmailValidationBeApplied.IsActive)
-            {
-                if (!ValidateEmail(student.Email))
-                    throw new Exception("Email không hợp lệ");
-            }
+            await _validator.ValidateStudentAsync(student.PhoneNumber, student.Email);
             var existingStudent = await GetStudentById(student.StudentId);
             if (existingStudent != null)
                 throw new Exception("Mã sinh viên đã tồn tại");
@@ -238,21 +227,6 @@ namespace backend.Services
             return await _context.Students.FindAsync(id);
         }
 
-        public bool ValidatePhone(string phoneNumber)
-        {
-            var regex = new System.Text.RegularExpressions.Regex(_studentSettings.PhoneNumber);
-            if (!regex.IsMatch(phoneNumber))
-                return false;
-            return true;
-        }
-
-        public bool ValidateEmail(string email)
-        {
-            if (!email.EndsWith(_studentSettings.EmailDomain))
-                return false;
-            return true;
-        }
-
         public bool IsTransitionAllowed(string currentStatus, string newStatus)
         {
             if (currentStatus == "DangHoc")
@@ -272,11 +246,6 @@ namespace backend.Services
                 return _studentStatusTransitions.DinhChi.Contains(newStatus);
             }
             return false;
-        }
-
-        bool IStudentService.ValidatePhone(string phoneNumber)
-        {
-            return ValidatePhone(phoneNumber);
         }
 
         public async Task<Student?> UpdateStudent(int studentId, UpdateStudentDto student)
@@ -301,19 +270,8 @@ namespace backend.Services
             if (existingStudent == null)
                 throw new Exception("Không tìm thấy sinh viên");
 
-            var shouldPhoneValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedPhonePattern");
-            if (shouldPhoneValidationBeApplied != null && shouldPhoneValidationBeApplied.IsActive)
-            {
-                if (!ValidatePhone(student.PhoneNumber))
-                    throw new Exception("Số điện thoại không hợp lệ");
-            }
+            await _validator.ValidateStudentAsync(student.PhoneNumber, student.Email);
 
-            var shouldEmailValidationBeApplied = await _configurationRepository.GetConfigurationByKeyAsync("AllowedEmailDomain");
-            if (shouldEmailValidationBeApplied != null && shouldEmailValidationBeApplied.IsActive)
-            {
-                if (!ValidateEmail(student.Email))
-                    throw new Exception("Email không hợp lệ");
-            }
             if(student.StudentId != studentId)
             {
                 var anotherStudent = await GetStudentById(student.StudentId);
